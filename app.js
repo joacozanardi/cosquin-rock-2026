@@ -6,6 +6,16 @@ let favorites = JSON.parse(localStorage.getItem('cr2026_favs')) || [];
 
 let isTransitioning = false;
 
+// --- Time Awareness Simulation ---
+// Simulating Feb 15, 2026 at 19:00 (Day 1) - Updated by user request
+const SIMULATION_MODE = true;
+const SIMULATED_DATE = new Date('2026-02-15T19:00:00');
+
+function getCurrentTime() {
+    return SIMULATION_MODE ? SIMULATED_DATE : new Date();
+}
+// ---------------------------------
+
 function switchMainView(view) {
     if (isTransitioning) return;
 
@@ -15,11 +25,9 @@ function switchMainView(view) {
     const targetIsExplorer = (view === 'Dia 1' || view === 'Dia 2');
 
     // Determine indices for direction calculation
-    // Dia 1 = 0, Dia 2 = 1, Itinerario = 2
     const viewOrder = { 'Dia 1': 0, 'Dia 2': 1, 'Itinerario': 2 };
     const currentViewName = !isExplorerActive ? 'Itinerario' : currentDay;
 
-    // Optimization
     if (currentViewName === view) return;
 
     const currentIndex = viewOrder[currentViewName];
@@ -29,15 +37,12 @@ function switchMainView(view) {
     isTransitioning = true;
     const activeEl = isExplorerActive ? explorer : itinerary;
 
-    // Set exit animation
     const exitClass = direction === 'forward' ? 'page-exit-left' : 'page-exit-right';
     const enterClass = direction === 'forward' ? 'page-enter-right' : 'page-enter-left';
 
-    // Clean previous classes
     activeEl.classList.remove('fade-in', 'page-enter-left', 'page-enter-right');
     activeEl.classList.add(exitClass);
 
-    // Update buttons immediately
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     if (view === 'Itinerario') {
         document.getElementById('btn-itinerary').classList.add('active');
@@ -66,14 +71,13 @@ function switchMainView(view) {
             itinerary.classList.add(enterClass);
         }
 
-        // Cleanup enter class after animation to avoid conflicts on next transition
         setTimeout(() => {
             const newActive = targetIsExplorer ? explorer : itinerary;
             newActive.classList.remove(enterClass);
             isTransitioning = false;
         }, 250);
 
-    }, 150); // Matches exit duration
+    }, 150);
 }
 
 function toggleFav(artist, time, stage, day, btnExample) {
@@ -84,29 +88,112 @@ function toggleFav(artist, time, stage, day, btnExample) {
 
     localStorage.setItem('cr2026_favs', JSON.stringify(favorites));
 
-    // If we are in the main explorer (list) view, avoid re-rendering to prevent animations
-    // Just toggle the class on the button itself if passed
     if (document.getElementById('view-explorer').style.display !== 'none' && btnExample) {
         btnExample.classList.toggle('active');
         return;
     }
 
-    // If we are in Itinerary, we MUST re-render to remove the card or update list
     if (document.getElementById('view-itinerary').style.display === 'block') {
         renderItinerary();
     } else {
-        // Fallback for search or other cases where we might want to re-render but usually above covers it
         renderContent();
     }
+}
+
+function parseTime(timeStr) {
+    const [h, m] = timeStr.split(':').map(Number);
+    const adjustedH = h < 6 ? h + 24 : h;
+    return adjustedH * 60 + m;
+}
+
+function formatCountdown(minutes) {
+    if (minutes < 60) return `En ${minutes} min`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    // Format: "En 2 horas" or "En 1h 30m"
+    // User asked for "en 2 horas"
+    if (m === 0) return `En ${h} ${h === 1 ? 'hora' : 'horas'}`;
+    return `En ${h}h ${m}m`;
+}
+
+// Logic to determine status based on the *set* of events
+function getEventStatuses(events, day) {
+    const now = getCurrentTime();
+    const showTargetDate = day === 'Dia 1' ? 15 : 16;
+
+    // 1. Day Check
+    if (now.getDate() !== showTargetDate) {
+        // If today is past the target date, ALL are past. If before, ALL are future.
+        const status = now.getDate() > showTargetDate ? 'past' : 'future';
+        return events.map(() => status);
+    }
+
+    // 2. Time Check
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const adjustedCurrent = now.getHours() < 6 ? currentMinutes + (24 * 60) : currentMinutes;
+
+    // Find the index of the latest started show
+    let activeIndex = -1;
+    for (let i = 0; i < events.length; i++) {
+        const evMinutes = parseTime(events[i].time);
+        if (adjustedCurrent >= evMinutes) {
+            activeIndex = i;
+        }
+    }
+
+    return events.map((_, i) => {
+        if (i < activeIndex) return 'past';
+        if (i === activeIndex) return 'live';
+        return 'future';
+    });
 }
 
 function renderContent() {
     const list = document.getElementById('mainTarget');
     const events = fullData[currentDay][currentStage] || [];
+    const statuses = getEventStatuses(events, currentDay);
+
+    // For countdown calculation
+    const now = getCurrentTime();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const adjustedCurrent = now.getHours() < 6 ? currentMinutes + (24 * 60) : currentMinutes;
+
     list.innerHTML = events.map((ev, i) => {
         const isFav = favorites.some(f => f.id === `${currentDay}-${currentStage}-${ev.artist}-${ev.time}`);
+        const status = statuses[i];
+
+        // CSS classes
+        let cardClass = status === 'past' ? ' card past' : '';
+        if (status === 'live') cardClass += ' card live';
+
+        let badge = '';
+        if (status === 'live') {
+            badge = '<div class="live-badge">AHORA</div>';
+        } else if (status === 'future') {
+            // Check if it's the same day for countdown
+            // Simulation logic assumes we are on the day if we aren't marking everything past/future globally
+            // But let's check strict date matching if needed. 
+            // Since getEventStatuses handles date check, if status is 'future' it implies we are either before the day or on the day before the time.
+            // Loophole: If we are on Dia 1 and looking at Dia 2, getEventStatuses returns 'future'.
+            // We should only show countdown if we are on the Same Day?
+            // "en 2 horas" makes sense mostly for same day. 
+            // If it's tomorrow, "En 24 horas" is valid but maybe not what is intended.
+            // Let's restrict countdown to SAME DAY for simplicity unless user wants cross-day.
+            // Usually "En X min" implies imminent.
+
+            const showTargetDate = currentDay === 'Dia 1' ? 15 : 16;
+            if (now.getDate() === showTargetDate) {
+                const showMinutes = parseTime(ev.time);
+                const diff = showMinutes - adjustedCurrent;
+                if (diff > 0) {
+                    badge = `<div class="live-badge" style="background:var(--fav); animation:none; color:black">${formatCountdown(diff)}</div>`;
+                }
+            }
+        }
+
         return `
-            <div class="card slide-up" style="animation-delay: ${i * 0.03}s">
+            <div class="card slide-up${cardClass}" style="animation-delay: ${i * 0.03}s" data-status="${status}">
+                ${badge}
                 <div class="card-info"><h4>${ev.artist}</h4><p>${currentStage}</p></div>
                 <div class="card-actions">
                     <div class="time">${ev.time}</div>
@@ -116,20 +203,21 @@ function renderContent() {
                 </div>
             </div>`;
     }).join('');
+
+    setTimeout(scrollToCurrent, 100);
 }
 
-function parseTime(timeStr) {
-    const [h, m] = timeStr.split(':').map(Number);
-    // Treat 00:00 to 05:00 as next day (hours 24 to 29)
-    const adjustedH = h < 6 ? h + 24 : h;
-    return adjustedH * 60 + m;
+function scrollToCurrent() {
+    const liveEl = document.querySelector('.card.live');
+    if (liveEl) {
+        liveEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }
 
 function renderItinerary() {
     const target = document.getElementById('itineraryTarget');
     let dayFavs = favorites.filter(f => f.day === itineraryDay);
 
-    // Improved sorting: late night shows (e.g. 01:00) come after evening shows (e.g. 23:00)
     dayFavs.sort((a, b) => parseTime(a.time) - parseTime(b.time));
 
     if (dayFavs.length === 0) {
@@ -137,10 +225,50 @@ function renderItinerary() {
         return;
     }
 
+    const now = getCurrentTime();
+    const showTargetDate = itineraryDay === 'Dia 1' ? 15 : 16;
+    const isSameDay = now.getDate() === showTargetDate;
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const adjustedCurrent = now.getHours() < 6 ? currentMinutes + (24 * 60) : currentMinutes;
+
     let html = '';
     dayFavs.forEach((f, i) => {
+        let cardClass = '';
+        let badge = '';
+
+        // Determine status for styling (gray out past)
+        if (isSameDay) {
+            const showMinutes = parseTime(f.time);
+            const diff = showMinutes - adjustedCurrent;
+            if (diff < 0) { // Past
+                // Check if it's arguably "Live" (within 40 mins? or just strictly past start time?)
+                // Itinerary logic requested: "Remove Active/Live status... show En X min".
+                // So if it started, and duration passed? 
+                // User said "show En X time... if upcoming".
+                // If it started 10 mins ago, it's not "En X". 
+                // It's effectively "Live" or "Past". 
+                // If we strictly follow "En X time" for future, what about current?
+                // If I look at the explorer logic, "Live" is special.
+                // In Itinerary, user said "no active", just countdown.
+                // So if diff < 0, it's just normal or past? 
+                // Let's mark as 'past' if it's REALLY past (e.g. > 1 hour ago).
+                // Actually, Explorer marks everything previous to LAST started as PAST.
+                // Here let's just use diff < 0 as PAST for simplicity, or maybe diff < -40.
+                // But wait, "Active/Live status removed".
+                // I will treat anything with diff < 0 as 'past' (gray) to keep it clean, as user didn't specify "Live" for itinerary.
+                cardClass = ' past';
+            } else {
+                // Future
+                badge = `<div class="live-badge" style="background:var(--fav); animation:none; color:black">${formatCountdown(diff)}</div>`;
+            }
+        } else {
+            if (now.getDate() > showTargetDate) cardClass = ' past';
+        }
+
         html += `
-            <div class="card slide-up" style="animation-delay: ${i * 0.03}s">
+            <div class="card slide-up${cardClass}" style="animation-delay: ${i * 0.03}s">
+                ${badge}
                 <div class="card-info"><h4>${f.artist}</h4><p>${f.stage}</p></div>
                 <div class="card-actions"><div class="time">${f.time}</div></div>
             </div>`;
@@ -200,7 +328,7 @@ function doSearch() {
     }).join('');
 }
 
-// Registro Offline (Solo funciona en https)
+// Registro Offline
 if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error', err));
