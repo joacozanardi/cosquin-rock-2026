@@ -7,8 +7,12 @@ let favorites = JSON.parse(localStorage.getItem('cr2026_favs')) || [];
 let isTransitioning = false;
 
 // --- Time Awareness Simulation ---
-// Simulating Feb 15, 2026 at 19:00 (Day 1) - Updated by user request
-const SIMULATION_MODE = true;
+// Simulating Feb 15, 2026 at 19:00 (Day 1)
+const SIMULATION_MODE = false;
+// NOTE: In a real "Auto-Refresh" scenario, simulation mode is weird because the "now" is fixed.
+// But to demonstrate the refresh, maybe the user wants to see the clock tick?
+// If SIMULATED_DATE is static, "refresh" won't change anything unless we increment the simulation.
+// For now, I'll keep it static as requested, but the refresh mechanism will work for real time.
 const SIMULATED_DATE = new Date('2026-02-15T19:00:00');
 
 function getCurrentTime() {
@@ -60,13 +64,13 @@ function switchMainView(view) {
                 currentDay = view;
                 currentStage = Object.keys(fullData[currentDay])[0];
                 renderStages();
-                renderContent();
+                renderContent(/* animate= */ true);
             }
             explorer.classList.remove('fade-in', 'page-exit-left', 'page-exit-right');
             explorer.classList.add(enterClass);
         } else {
             itinerary.style.display = 'block';
-            renderItinerary();
+            renderItinerary(/* animate= */ true);
             itinerary.classList.remove('fade-in', 'page-exit-left', 'page-exit-right');
             itinerary.classList.add(enterClass);
         }
@@ -93,10 +97,11 @@ function toggleFav(artist, time, stage, day, btnExample) {
         return;
     }
 
+    // Force re-render with animation false to keep it snappy but correct
     if (document.getElementById('view-itinerary').style.display === 'block') {
-        renderItinerary();
+        renderItinerary(false);
     } else {
-        renderContent();
+        renderContent(false);
     }
 }
 
@@ -110,29 +115,22 @@ function formatCountdown(minutes) {
     if (minutes < 60) return `En ${minutes} min`;
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
-    // Format: "En 2 horas" or "En 1h 30m"
-    // User asked for "en 2 horas"
     if (m === 0) return `En ${h} ${h === 1 ? 'hora' : 'horas'}`;
     return `En ${h}h ${m}m`;
 }
 
-// Logic to determine status based on the *set* of events
 function getEventStatuses(events, day) {
     const now = getCurrentTime();
     const showTargetDate = day === 'Dia 1' ? 15 : 16;
 
-    // 1. Day Check
     if (now.getDate() !== showTargetDate) {
-        // If today is past the target date, ALL are past. If before, ALL are future.
         const status = now.getDate() > showTargetDate ? 'past' : 'future';
         return events.map(() => status);
     }
 
-    // 2. Time Check
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
     const adjustedCurrent = now.getHours() < 6 ? currentMinutes + (24 * 60) : currentMinutes;
 
-    // Find the index of the latest started show
     let activeIndex = -1;
     for (let i = 0; i < events.length; i++) {
         const evMinutes = parseTime(events[i].time);
@@ -148,12 +146,11 @@ function getEventStatuses(events, day) {
     });
 }
 
-function renderContent() {
+function renderContent(animate = true) {
     const list = document.getElementById('mainTarget');
     const events = fullData[currentDay][currentStage] || [];
     const statuses = getEventStatuses(events, currentDay);
 
-    // For countdown calculation
     const now = getCurrentTime();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
     const adjustedCurrent = now.getHours() < 6 ? currentMinutes + (24 * 60) : currentMinutes;
@@ -162,25 +159,18 @@ function renderContent() {
         const isFav = favorites.some(f => f.id === `${currentDay}-${currentStage}-${ev.artist}-${ev.time}`);
         const status = statuses[i];
 
-        // CSS classes
         let cardClass = status === 'past' ? ' card past' : '';
         if (status === 'live') cardClass += ' card live';
+        // Add slide-up only if animate is true
+        if (animate) cardClass += ' slide-up';
+
+        // Retain animation delay style only if animating, else remove it or keep it (harmless without class)
+        const animDelay = animate ? `style="animation-delay: ${i * 0.03}s"` : '';
 
         let badge = '';
         if (status === 'live') {
             badge = '<div class="live-badge">AHORA</div>';
         } else if (status === 'future') {
-            // Check if it's the same day for countdown
-            // Simulation logic assumes we are on the day if we aren't marking everything past/future globally
-            // But let's check strict date matching if needed. 
-            // Since getEventStatuses handles date check, if status is 'future' it implies we are either before the day or on the day before the time.
-            // Loophole: If we are on Dia 1 and looking at Dia 2, getEventStatuses returns 'future'.
-            // We should only show countdown if we are on the Same Day?
-            // "en 2 horas" makes sense mostly for same day. 
-            // If it's tomorrow, "En 24 horas" is valid but maybe not what is intended.
-            // Let's restrict countdown to SAME DAY for simplicity unless user wants cross-day.
-            // Usually "En X min" implies imminent.
-
             const showTargetDate = currentDay === 'Dia 1' ? 15 : 16;
             if (now.getDate() === showTargetDate) {
                 const showMinutes = parseTime(ev.time);
@@ -192,7 +182,7 @@ function renderContent() {
         }
 
         return `
-            <div class="card slide-up${cardClass}" style="animation-delay: ${i * 0.03}s" data-status="${status}">
+            <div class="${cardClass}" ${animDelay} data-status="${status}">
                 ${badge}
                 <div class="card-info"><h4>${ev.artist}</h4><p>${currentStage}</p></div>
                 <div class="card-actions">
@@ -204,7 +194,8 @@ function renderContent() {
             </div>`;
     }).join('');
 
-    setTimeout(scrollToCurrent, 100);
+    // Only scroll if animating (first load/view switch) or if it's essential
+    if (animate) setTimeout(scrollToCurrent, 100);
 }
 
 function scrollToCurrent() {
@@ -214,7 +205,7 @@ function scrollToCurrent() {
     }
 }
 
-function renderItinerary() {
+function renderItinerary(animate = true) {
     const target = document.getElementById('itineraryTarget');
     let dayFavs = favorites.filter(f => f.day === itineraryDay);
 
@@ -235,39 +226,25 @@ function renderItinerary() {
     let html = '';
     dayFavs.forEach((f, i) => {
         let cardClass = '';
+        if (animate) cardClass += ' slide-up';
+
+        const animDelay = animate ? `style="animation-delay: ${i * 0.03}s"` : '';
         let badge = '';
 
-        // Determine status for styling (gray out past)
         if (isSameDay) {
             const showMinutes = parseTime(f.time);
             const diff = showMinutes - adjustedCurrent;
-            if (diff < 0) { // Past
-                // Check if it's arguably "Live" (within 40 mins? or just strictly past start time?)
-                // Itinerary logic requested: "Remove Active/Live status... show En X min".
-                // So if it started, and duration passed? 
-                // User said "show En X time... if upcoming".
-                // If it started 10 mins ago, it's not "En X". 
-                // It's effectively "Live" or "Past". 
-                // If we strictly follow "En X time" for future, what about current?
-                // If I look at the explorer logic, "Live" is special.
-                // In Itinerary, user said "no active", just countdown.
-                // So if diff < 0, it's just normal or past? 
-                // Let's mark as 'past' if it's REALLY past (e.g. > 1 hour ago).
-                // Actually, Explorer marks everything previous to LAST started as PAST.
-                // Here let's just use diff < 0 as PAST for simplicity, or maybe diff < -40.
-                // But wait, "Active/Live status removed".
-                // I will treat anything with diff < 0 as 'past' (gray) to keep it clean, as user didn't specify "Live" for itinerary.
-                cardClass = ' past';
+            if (diff < 0) {
+                cardClass += ' past';
             } else {
-                // Future
                 badge = `<div class="live-badge" style="background:var(--fav); animation:none; color:black">${formatCountdown(diff)}</div>`;
             }
         } else {
-            if (now.getDate() > showTargetDate) cardClass = ' past';
+            if (now.getDate() > showTargetDate) cardClass += ' past';
         }
 
         html += `
-            <div class="card slide-up${cardClass}" style="animation-delay: ${i * 0.03}s">
+            <div class="card ${cardClass}" ${animDelay}>
                 ${badge}
                 <div class="card-info"><h4>${f.artist}</h4><p>${f.stage}</p></div>
                 <div class="card-actions"><div class="time">${f.time}</div></div>
@@ -276,8 +253,12 @@ function renderItinerary() {
         if (i < dayFavs.length - 1) {
             const next = dayFavs[i + 1];
             if (next.stage !== f.stage) {
+                // Determine walking card animation
+                const walkDelay = animate ? `style="animation-delay: ${(i * 0.03) + 0.015}s"` : '';
+                const walkClass = animate ? 'walking-card slide-up' : 'walking-card';
+
                 html += `
-                    <div class="walking-card slide-up" style="animation-delay: ${(i * 0.03) + 0.015}s">
+                    <div class="${walkClass}" ${walkDelay}>
                         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 4v16M17 8l-4-4-4 4M17 16l-4 4-4-4"/></svg>
                         Caminar hacia escenario ${next.stage}
                     </div>`;
@@ -327,6 +308,18 @@ function doSearch() {
             </div>`;
     }).join('');
 }
+
+// Auto-Refresh Every 60 Seconds
+setInterval(() => {
+    // Only refresh if the page is visible to save resources (optional, but good practice)
+    if (!document.hidden) {
+        if (document.getElementById('view-explorer').style.display !== 'none') {
+            renderContent(false);
+        } else if (document.getElementById('view-itinerary').style.display === 'block') {
+            renderItinerary(false);
+        }
+    }
+}, 60000);
 
 // Registro Offline
 if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
