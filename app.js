@@ -159,8 +159,9 @@ function renderContent(animate = true) {
         const isFav = favorites.some(f => f.id === `${currentDay}-${currentStage}-${ev.artist}-${ev.time}`);
         const status = statuses[i];
 
-        let cardClass = status === 'past' ? ' card past' : '';
-        if (status === 'live') cardClass += ' card live';
+        let cardClass = 'card';
+        if (status === 'past') cardClass += ' past';
+        if (status === 'live') cardClass += ' live';
         // Add slide-up only if animate is true
         if (animate) cardClass += ' slide-up';
 
