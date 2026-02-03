@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,160 +9,333 @@
     <meta name="theme-color" content="#e63946">
     <style>
         :root {
-            --primary: #e63946; --bg: #ffffff; --surface: #f8f9fa; --card: #ffffff;
-            --text: #1a1a1a; --text-dim: #6c757d; --border: #dee2e6; --fav: #ffb703;
+            --primary: #e63946;
+            --bg: #ffffff;
+            --surface: #f8f9fa;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --text-dim: #6c757d;
+            --border: #dee2e6;
+            --fav: #ffb703;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 90px; }
-        
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding-bottom: 90px;
+        }
+
         /* Header con Texto Original */
-        .top-app-bar { 
-            background: var(--bg); padding: 15px; text-align: center; 
-            font-weight: 900; font-size: 1.2rem; letter-spacing: -0.5px;
-            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; 
+        .top-app-bar {
+            background: var(--bg);
+            padding: 15px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .search-box { background: var(--bg); padding: 10px 15px; position: sticky; top: 54px; z-index: 999; }
-        .search-input { 
-            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); 
-            background: var(--surface); color: var(--text); font-size: 1rem; outline: none; 
+        .search-box {
+            background: var(--bg);
+            padding: 10px 15px;
+            position: sticky;
+            top: 54px;
+            z-index: 999;
         }
 
-        .stages-nav { background: var(--bg); padding: 0 15px 15px; position: sticky; top: 120px; z-index: 998; border-bottom: 1px solid var(--border); }
-        .stages-scroll { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
-        .stages-scroll::-webkit-scrollbar { display: none; }
-        .stage-btn { 
-            white-space: nowrap; padding: 10px 18px; border-radius: 25px; 
-            background: var(--surface); color: var(--text-dim); border: 1px solid var(--border); 
-            font-size: 0.85rem; font-weight: bold; 
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
         }
-        .stage-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
 
-        .container { padding: 15px; }
-        .label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); margin: 15px 0 10px; letter-spacing: 1.2px; font-weight: 800; }
-        
-        .card { 
-            background: var(--card); border-radius: 16px; padding: 18px; margin-bottom: 12px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        .stages-nav {
+            background: var(--bg);
+            padding: 0 15px 15px;
+            position: sticky;
+            top: 120px;
+            z-index: 998;
+            border-bottom: 1px solid var(--border);
         }
-        .card h4 { font-size: 1.1rem; margin-bottom: 3px; color: var(--text); }
-        .card p { color: var(--text-dim); font-size: 0.85rem; }
-        .card-actions { display: flex; align-items: center; gap: 15px; }
-        .time { font-weight: 800; color: var(--primary); font-size: 1.1rem; }
-        .fav-btn { background: none; border: none; color: #ccc; cursor: pointer; padding: 5px; }
-        .fav-btn.active { color: var(--fav); }
+
+        .stages-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            scrollbar-width: none;
+        }
+
+        .stages-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .stage-btn {
+            white-space: nowrap;
+            padding: 10px 18px;
+            border-radius: 25px;
+            background: var(--surface);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .stage-btn.active {
+            background: var(--text);
+            color: #fff;
+            border-color: var(--text);
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin: 15px 0 10px;
+            letter-spacing: 1.2px;
+            font-weight: 800;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+            color: var(--text);
+        }
+
+        .card p {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .time {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .fav-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .fav-btn.active {
+            color: var(--fav);
+        }
 
         .walking-card {
-            margin: -5px 0 15px 20px; padding: 10px; border-left: 2px dashed var(--border);
-            display: flex; align-items: center; gap: 10px; color: var(--text-dim); font-size: 0.85rem; font-weight: 600;
+            margin: -5px 0 15px 20px;
+            padding: 10px;
+            border-left: 2px dashed var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
-        .bottom-nav { 
-            position: fixed; bottom: 0; width: 100%; height: 75px; 
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-            display: flex; border-top: 1px solid var(--border); z-index: 1000; 
-            padding-bottom: env(safe-area-inset-bottom); 
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 75px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            border-top: 1px solid var(--border);
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); border: none; background: none; font-size: 0.7rem; font-weight: bold; gap: 4px; }
-        .nav-btn.active { color: var(--primary); }
-        .nav-btn svg { width: 22px; height: 22px; }
 
-        .itinerary-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .sub-tab { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); font-weight: bold; font-size: 0.8rem; }
-        .sub-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            border: none;
+            background: none;
+            font-size: 0.7rem;
+            font-weight: bold;
+            gap: 4px;
+        }
+
+        .nav-btn.active {
+            color: var(--primary);
+        }
+
+        .nav-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .itinerary-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sub-tab {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .sub-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
     </style>
 </head>
+
 <body>
 
-<div class="top-app-bar">COSQUIN ROCK 2026</div>
+    <div class="top-app-bar">COSQUIN ROCK 2026</div>
 
-<div id="view-explorer">
-    <div class="search-box">
-        <input type="text" class="search-input" id="artistSearch" placeholder="Buscar artista..." oninput="doSearch()">
-    </div>
-    <div class="stages-nav" id="stageBar">
-        <div class="stages-scroll" id="stageList"></div>
-    </div>
-    <div class="container">
-        <div class="label" id="listLabel">Cronograma</div>
-        <div id="mainTarget"></div>
-    </div>
-</div>
-
-<div id="view-itinerary" style="display:none">
-    <div class="container">
-        <div class="itinerary-tabs">
-            <button class="sub-tab active" onclick="setItineraryDay('Dia 1')">SÁB 15</button>
-            <button class="sub-tab" onclick="setItineraryDay('Dia 2')">DOM 16</button>
+    <div id="view-explorer">
+        <div class="search-box">
+            <input type="text" class="search-input" id="artistSearch" placeholder="Buscar artista..."
+                oninput="doSearch()">
         </div>
-        <div class="label">Mi Itinerario Personal</div>
-        <div id="itineraryTarget"></div>
+        <div class="stages-nav" id="stageBar">
+            <div class="stages-scroll" id="stageList"></div>
+        </div>
+        <div class="container">
+            <div class="label" id="listLabel">Cronograma</div>
+            <div id="mainTarget"></div>
+        </div>
     </div>
-</div>
 
-<nav class="bottom-nav">
-    <button class="nav-btn active" id="btn-dia1" onclick="switchMainView('Dia 1')">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
-        SÁB 15
-    </button>
-    <button class="nav-btn" id="btn-dia2" onclick="switchMainView('Dia 2')">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
-        DOM 16
-    </button>
-    <button class="nav-btn" id="btn-itinerary" onclick="switchMainView('Itinerario')">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/></svg>
-        ITINERARIO
-    </button>
-</nav>
+    <div id="view-itinerary" style="display:none">
+        <div class="container">
+            <div class="itinerary-tabs">
+                <button class="sub-tab active" onclick="setItineraryDay('Dia 1')">SÁB 15</button>
+                <button class="sub-tab" onclick="setItineraryDay('Dia 2')">DOM 16</button>
+            </div>
+            <div class="label">Mi Itinerario Personal</div>
+            <div id="itineraryTarget"></div>
+        </div>
+    </div>
 
-<script>
-// Datos precargados y lógica de favoritos
-const fullData = {"Dia 1": {"Norte": [{"time": "14:30", "artist": "Kill flora"}, {"time": "15:20", "artist": "Eruca sativa"}, {"time": "16:30", "artist": "El zar"}, {"time": "17:50", "artist": "Turf"}, {"time": "19:30", "artist": "Dillom"}, {"time": "21:20", "artist": "Babasonicos"}, {"time": "23:20", "artist": "Lali"}, {"time": "00:40", "artist": "Caligaris"}], "Sur": [{"time": "14:30", "artist": "Fantasmagoria"}, {"time": "15:20", "artist": "La mississippi"}, {"time": "16:30", "artist": "Emi"}, {"time": "17:50", "artist": "Cruzando el charco"}, {"time": "19:40", "artist": "Ciro y los persas"}, {"time": "21:40", "artist": "La vela puerca"}, {"time": "23:20", "artist": "Las pelotas"}, {"time": "00:40", "artist": "Viejas locas / Jovenes pordioseros x fachi y abel"}], "Montaña": [{"time": "14:10", "artist": "Chechi de marcos"}, {"time": "15:00", "artist": "Ryan"}, {"time": "15:50", "artist": "Bersuit vergarabat"}, {"time": "17:10", "artist": "Marilina bertoldi"}, {"time": "18:40", "artist": "El kuelgue"}, {"time": "20:40", "artist": "Cuarteto de nos"}, {"time": "22:40", "artist": "Franz ferdinand"}, {"time": "00:00", "artist": "The chemical brothers (DJ set)"}, {"time": "02:00", "artist": "Victoria whynot"}], "Boomerang": [{"time": "14:10", "artist": "Microtul"}, {"time": "14:50", "artist": "1915"}, {"time": "15:40", "artist": "Un muerto mas"}, {"time": "16:30", "artist": "Girl ultra"}, {"time": "17:20", "artist": "Hermanos gutierrez"}, {"time": "18:20", "artist": "Indios"}, {"time": "19:20", "artist": "Estelares"}, {"time": "20:40", "artist": "Abel pintos"}, {"time": "21:50", "artist": "La franela"}, {"time": "23:10", "artist": "Coti"}, {"time": "00:30", "artist": "Amigo de artistas"}], "La casita  del blues": [{"time": "14:10", "artist": "Golo's band"}, {"time": "15:00", "artist": "Los mentidores"}, {"time": "15:50", "artist": "Las witches"}, {"time": "16:50", "artist": "Le dracs"}, {"time": "17:40", "artist": "Perro suizo"}, {"time": "18:40", "artist": "Misty soul choir"}, {"time": "19:30", "artist": "Tango & roll"}, {"time": "20:30", "artist": "Wayra iglesias"}, {"time": "21:20", "artist": "Los espiritus"}, {"time": "22:30", "artist": "Piti fernandez"}, {"time": "23:30", "artist": "Les diabolettes"}], "La plaza electronic stage": [{"time": "16:00", "artist": "Claudio ricci"}, {"time": "17:00", "artist": "Valentini huedo B2B bruz"}, {"time": "19:00", "artist": "Lehar B2B Santiago garcia"}, {"time": "21:00", "artist": "Sora"}, {"time": "22:30", "artist": "Arkadyan"}], "Sorpresa": [{"time": "15:50", "artist": "Falsed"}, {"time": "18:40", "artist": "Sorpresa"}, {"time": "22:20", "artist": "Sorpresa"}]}, "Dia 2": {"Norte": [{"time": "14:30", "artist": "Sofi mora"}, {"time": "15:20", "artist": "Blair"}, {"time": "16:30", "artist": "Gauchito club"}, {"time": "17:50", "artist": "Bandalos chinos"}, {"time": "19:10", "artist": "Fito paez"}, {"time": "20:50", "artist": "Airbag"}, {"time": "23:00", "artist": "Ysy a"}, {"time": "00:20", "artist": "Caras extrañas"}], "Sur": [{"time": "14:20", "artist": "Ainda"}, {"time": "15:10", "artist": "Kapanga"}, {"time": "16:20", "artist": "Pappo x juanse"}, {"time": "17:40", "artist": "El plan de la mariposa"}, {"time": "19:40", "artist": "Divididos"}, {"time": "21:30", "artist": "Trueno"}, {"time": "23:10", "artist": "Guasones"}, {"time": "00:50", "artist": "Louta"}], "Montaña": [{"time": "14:30", "artist": "Renzo leali"}, {"time": "15:00", "artist": "Beats modernos"}, {"time": "15:50", "artist": "Gustavo cordera"}, {"time": "17:00", "artist": "Los pericos"}, {"time": "18:30", "artist": "Silvestre y la naranja"}, {"time": "20:20", "artist": "Morat"}, {"time": "22:20", "artist": "Las pastillas del abuelo"}, {"time": "00:00", "artist": "Peces raros"}, {"time": "01:00", "artist": "Mariano mellino"}, {"time": "02:00", "artist": "Franky wha"}], "Paraguay": [{"time": "14:20", "artist": "Wanda jael"}, {"time": "15:10", "artist": "TGK"}, {"time": "16:10", "artist": "Malandro"}, {"time": "17:20", "artist": "Gauchos of the pampa"}, {"time": "18:20", "artist": "Devendra banhart"}, {"time": "19:30", "artist": "Dum chica"}, {"time": "20:30", "artist": "Marky ramone"}, {"time": "21:30", "artist": "David ellefson"}, {"time": "22:30", "artist": "CTM"}, {"time": "23:30", "artist": "Six sex"}, {"time": "00:40", "artist": "El club de la serpiente"}], "La casita  del blues": [{"time": "14:10", "artist": "Rosy gomeez"}, {"time": "15:00", "artist": "Labios de sal"}, {"time": "15:50", "artist": "Rudy"}, {"time": "16:50", "artist": "Bulldozer blues band"}, {"time": "17:40", "artist": "Cordelia's blues"}, {"time": "18:40", "artist": "Grasshopper's"}, {"time": "19:30", "artist": "Gisa londero & toyo bagoso"}, {"time": "20:40", "artist": "Crystal thomas & Luca giordano"}, {"time": "21:40", "artist": "Nina portela"}, {"time": "22:40", "artist": "Xime monzon"}, {"time": "23:30", "artist": "Loretta sorbello"}], "La plaza electronic stage": [{"time": "16:00", "artist": "Lourdes lourdes"}, {"time": "17:00", "artist": "Glauco di mambro"}, {"time": "18:00", "artist": "Brigado crew"}, {"time": "19:30", "artist": "Deer jade"}, {"time": "21:00", "artist": "Franky wah"}, {"time": "22:30", "artist": "Kolsch"}, {"time": "00:00", "artist": "Matias tanzmann"}], "Sorpresa": [{"time": "15:50", "artist": "Golden floyd"}, {"time": "17:10", "artist": "Sorpresa"}, {"time": "22:20", "artist": "Agarrate catalina"}]}};
+    <nav class="bottom-nav">
+        <button class="nav-btn active" id="btn-dia1" onclick="switchMainView('Dia 1')">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+            </svg>
+            SÁB 15
+        </button>
+        <button class="nav-btn" id="btn-dia2" onclick="switchMainView('Dia 2')">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+            </svg>
+            DOM 16
+        </button>
+        <button class="nav-btn" id="btn-itinerary" onclick="switchMainView('Itinerario')">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z" />
+            </svg>
+            ITINERARIO
+        </button>
+    </nav>
 
-let currentDay = 'Dia 1';
-let currentStage = 'Norte';
-let itineraryDay = 'Dia 1';
-let favorites = JSON.parse(localStorage.getItem('cr2026_favs')) || [];
+    <script src="data.js"></script>
+    <script>
+        // Datos precargados y lógica de favoritos
+        // Data moved to data.js
 
-function switchMainView(view) {
-    const explorer = document.getElementById('view-explorer');
-    const itinerary = document.getElementById('view-itinerary');
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        let currentDay = 'Dia 1';
+        let currentStage = 'Norte';
+        let itineraryDay = 'Dia 1';
+        let favorites = JSON.parse(localStorage.getItem('cr2026_favs')) || [];
 
-    if (view === 'Itinerario') {
-        explorer.style.display = 'none';
-        itinerary.style.display = 'block';
-        document.getElementById('btn-itinerary').classList.add('active');
-        renderItinerary();
-    } else {
-        explorer.style.display = 'block';
-        itinerary.style.display = 'none';
-        currentDay = view;
-        document.getElementById(view === 'Dia 1' ? 'btn-dia1' : 'btn-dia2').classList.add('active');
-        currentStage = Object.keys(fullData[currentDay])[0];
-        renderStages();
-        renderContent();
-    }
-}
+        function switchMainView(view) {
+            const explorer = document.getElementById('view-explorer');
+            const itinerary = document.getElementById('view-itinerary');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
-function toggleFav(artist, time, stage, day) {
-    const id = `${day}-${stage}-${artist}-${time}`;
-    const idx = favorites.findIndex(f => f.id === id);
-    if (idx > -1) favorites.splice(idx, 1);
-    else favorites.push({ id, artist, time, stage, day });
-    
-    localStorage.setItem('cr2026_favs', JSON.stringify(favorites));
-    renderContent();
-    if (document.getElementById('view-itinerary').style.display === 'block') renderItinerary();
-}
+            if (view === 'Itinerario') {
+                explorer.style.display = 'none';
+                itinerary.style.display = 'block';
+                document.getElementById('btn-itinerary').classList.add('active');
+                renderItinerary();
+            } else {
+                explorer.style.display = 'block';
+                itinerary.style.display = 'none';
+                currentDay = view;
+                document.getElementById(view === 'Dia 1' ? 'btn-dia1' : 'btn-dia2').classList.add('active');
+                currentStage = Object.keys(fullData[currentDay])[0];
+                renderStages();
+                renderContent();
+            }
+        }
 
-function renderContent() {
-    const list = document.getElementById('mainTarget');
-    const events = fullData[currentDay][currentStage] || [];
-    list.innerHTML = events.map(ev => {
-        const isFav = favorites.some(f => f.id === `${currentDay}-${currentStage}-${ev.artist}-${ev.time}`);
-        return `
+        function toggleFav(artist, time, stage, day) {
+            const id = `${day}-${stage}-${artist}-${time}`;
+            const idx = favorites.findIndex(f => f.id === id);
+            if (idx > -1) favorites.splice(idx, 1);
+            else favorites.push({ id, artist, time, stage, day });
+
+            localStorage.setItem('cr2026_favs', JSON.stringify(favorites));
+            renderContent();
+            if (document.getElementById('view-itinerary').style.display === 'block') renderItinerary();
+        }
+
+        function renderContent() {
+            const list = document.getElementById('mainTarget');
+            const events = fullData[currentDay][currentStage] || [];
+            list.innerHTML = events.map(ev => {
+                const isFav = favorites.some(f => f.id === `${currentDay}-${currentStage}-${ev.artist}-${ev.time}`);
+                return `
             <div class="card">
                 <div class="card-info"><h4>${ev.artist}</h4><p>${currentStage}</p></div>
                 <div class="card-actions">
@@ -171,70 +345,70 @@ function renderContent() {
                     </button>
                 </div>
             </div>`;
-    }).join('');
-}
+            }).join('');
+        }
 
-function renderItinerary() {
-    const target = document.getElementById('itineraryTarget');
-    let dayFavs = favorites.filter(f => f.day === itineraryDay);
-    dayFavs.sort((a, b) => a.time.localeCompare(b.time));
+        function renderItinerary() {
+            const target = document.getElementById('itineraryTarget');
+            let dayFavs = favorites.filter(f => f.day === itineraryDay);
+            dayFavs.sort((a, b) => a.time.localeCompare(b.time));
 
-    if (dayFavs.length === 0) {
-        target.innerHTML = '<p style="padding:40px; text-align:center; color:#999">No has marcado favoritos aún.</p>';
-        return;
-    }
+            if (dayFavs.length === 0) {
+                target.innerHTML = '<p style="padding:40px; text-align:center; color:#999">No has marcado favoritos aún.</p>';
+                return;
+            }
 
-    let html = '';
-    dayFavs.forEach((f, i) => {
-        html += `
+            let html = '';
+            dayFavs.forEach((f, i) => {
+                html += `
             <div class="card">
                 <div class="card-info"><h4>${f.artist}</h4><p>${f.stage}</p></div>
                 <div class="card-actions"><div class="time">${f.time}</div></div>
             </div>`;
-        
-        if (i < dayFavs.length - 1) {
-            const next = dayFavs[i+1];
-            if (next.stage !== f.stage) {
-                html += `
+
+                if (i < dayFavs.length - 1) {
+                    const next = dayFavs[i + 1];
+                    if (next.stage !== f.stage) {
+                        html += `
                     <div class="walking-card">
                         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 4v16M17 8l-4-4-4 4M17 16l-4 4-4-4"/></svg>
                         Caminar hacia escenario ${next.stage}
                     </div>`;
-            }
+                    }
+                }
+            });
+            target.innerHTML = html;
         }
-    });
-    target.innerHTML = html;
-}
 
-function setItineraryDay(day) {
-    itineraryDay = day;
-    document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(day === 'Dia 1' ? '15' : '16')));
-    renderItinerary();
-}
+        function setItineraryDay(day) {
+            itineraryDay = day;
+            document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(day === 'Dia 1' ? '15' : '16')));
+            renderItinerary();
+        }
 
-function renderStages() {
-    const bar = document.getElementById('stageList');
-    bar.innerHTML = Object.keys(fullData[currentDay]).map(s => `
+        function renderStages() {
+            const bar = document.getElementById('stageList');
+            bar.innerHTML = Object.keys(fullData[currentDay]).map(s => `
         <button class="stage-btn ${s === currentStage ? 'active' : ''}" onclick="setStage('${s}')">${s}</button>
     `).join('');
-}
+        }
 
-function setStage(s) { currentStage = s; renderStages(); renderContent(); }
+        function setStage(s) { currentStage = s; renderStages(); renderContent(); }
 
-function doSearch() {
-    const q = document.getElementById('artistSearch').value.toLowerCase();
-    const list = document.getElementById('mainTarget');
-    if (q.length < 2) { renderContent(); return; }
-    
-    let matches = [];
-    for (let s in fullData[currentDay]) {
-        fullData[currentDay][s].forEach(ev => {
-            if (ev.artist.toLowerCase().includes(q)) matches.push({...ev, s});
-        });
-    }
-    list.innerHTML = matches.map(m => {
-        const isFav = favorites.some(f => f.id === `${currentDay}-${m.s}-${m.artist}-${m.time}`);
-        return `
+        function doSearch() {
+            const q = document.getElementById('artistSearch').value.toLowerCase();
+            const list = document.getElementById('mainTarget');
+            if (q.length < 2) { renderContent(); return; }
+
+            let matches = [];
+            for (let s in fullData[currentDay]) {
+                fullData[currentDay][s].forEach(ev => {
+                    if (ev.artist.toLowerCase().includes(q)) matches.push({ ...ev, s });
+                });
+            }
+            list.innerHTML = matches.map(m => {
+                const isFav = favorites.some(f => f.id === `${currentDay}-${m.s}-${m.artist}-${m.time}`);
+                return `
             <div class="card">
                 <div class="card-info"><h4>${m.artist}</h4><p>${m.s}</p></div>
                 <div class="card-actions">
@@ -244,18 +418,19 @@ function doSearch() {
                     </button>
                 </div>
             </div>`;
-    }).join('');
-}
+            }).join('');
+        }
 
-// Registro Offline (Solo funciona en https)
-if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error', err));
-    });
-}
+        // Registro Offline (Solo funciona en https)
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error', err));
+            });
+        }
 
-renderStages();
-renderContent();
-</script>
+        renderStages();
+        renderContent();
+    </script>
 </body>
+
 </html>
