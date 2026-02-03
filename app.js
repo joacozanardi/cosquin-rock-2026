@@ -13,7 +13,7 @@ const SIMULATION_MODE = false;
 // But to demonstrate the refresh, maybe the user wants to see the clock tick?
 // If SIMULATED_DATE is static, "refresh" won't change anything unless we increment the simulation.
 // For now, I'll keep it static as requested, but the refresh mechanism will work for real time.
-const SIMULATED_DATE = new Date('2026-02-15T19:00:00');
+const SIMULATED_DATE = new Date('2026-02-14T19:00:00');
 
 function getCurrentTime() {
     return SIMULATION_MODE ? SIMULATED_DATE : new Date();
@@ -121,7 +121,7 @@ function formatCountdown(minutes) {
 
 function getEventStatuses(events, day) {
     const now = getCurrentTime();
-    const showTargetDate = day === 'Dia 1' ? 15 : 16;
+    const showTargetDate = day === 'Dia 1' ? 14 : 15;
 
     if (now.getDate() !== showTargetDate) {
         const status = now.getDate() > showTargetDate ? 'past' : 'future';
@@ -172,7 +172,7 @@ function renderContent(animate = true) {
         if (status === 'live') {
             badge = '<div class="live-badge">AHORA</div>';
         } else if (status === 'future') {
-            const showTargetDate = currentDay === 'Dia 1' ? 15 : 16;
+            const showTargetDate = currentDay === 'Dia 1' ? 14 : 15;
             if (now.getDate() === showTargetDate) {
                 const showMinutes = parseTime(ev.time);
                 const diff = showMinutes - adjustedCurrent;
@@ -218,7 +218,7 @@ function renderItinerary(animate = true) {
     }
 
     const now = getCurrentTime();
-    const showTargetDate = itineraryDay === 'Dia 1' ? 15 : 16;
+    const showTargetDate = itineraryDay === 'Dia 1' ? 14 : 15;
     const isSameDay = now.getDate() === showTargetDate;
 
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -271,7 +271,7 @@ function renderItinerary(animate = true) {
 
 function setItineraryDay(day) {
     itineraryDay = day;
-    document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(day === 'Dia 1' ? '15' : '16')));
+    document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b.innerText.includes(day === 'Dia 1' ? '14' : '15')));
     renderItinerary();
 }
 
